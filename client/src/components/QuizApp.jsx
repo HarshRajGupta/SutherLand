@@ -7,7 +7,7 @@ const QuizApp = () => {
   const [answers, setAnswers] = useState([]);
   const [score, setScore] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(5);
 
   const handleAnswerSelection = (index, selectedAnswer) => {
     const newAnswers = [...answers];
@@ -15,7 +15,8 @@ const QuizApp = () => {
     setAnswers(newAnswers);
   };
 
-  const calculateScore = () => {
+  const handleSubmit = (e) => {
+    e?.preventDefault();
     setSubmitted(true);
     let totalScore = 0;
     answers.forEach((answer, index) => {
@@ -26,26 +27,26 @@ const QuizApp = () => {
     setScore(totalScore);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    calculateScore();
-  };
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => prevTime - 1);
     }, 1000);
 
+    if (timeLeft === 0) {
+      clearInterval(timer);
+      handleSubmit();
+    }
+
     return () => {
       clearInterval(timer);
     };
-  }, []);
-
-  useEffect(() => {
-    if (timeLeft === 0) {
-      calculateScore();
-    }
   }, [timeLeft]);
+
+  // useEffect(() => {
+  //   if (timeLeft === 0) {
+  //     handleSubmit();
+  //   }
+  // }, [timeLeft]);
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
