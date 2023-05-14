@@ -32,7 +32,7 @@ const createQuiz = async (req, res) => {
             testId: testId,
             userId: userId,
             questions: questionSet,
-            endTime: Date.now() + test.testDuration * 60 * 1000
+            endTime: Date.now() + (test.testDuration * 60 * 1000)
         });
         const quiz = await quizObject.save();
         console.log('DEBUG: Quiz created');

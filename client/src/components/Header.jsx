@@ -7,6 +7,7 @@ const Header = ({ user, setUser }) => {
 		await axios.post('/auth/logout');
 		setUser(null);
 		toast.success("Logged out successfully");
+		localStorage.removeItem('user');
 	};
 	return (
 		<header className="bg-gray-200 h-14 flex items-center justify-between p-4">

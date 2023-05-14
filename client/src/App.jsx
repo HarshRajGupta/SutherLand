@@ -24,9 +24,7 @@ const App = () => {
 			});
 		};
 		setStatus('loaded');
-		if (user && user._id) {
-			localStorage.setItem('user', user._id);
-		}
+		console.log(user);
 		fetchUser();
 	}, []);
 	if (status === 'loading') return <div>Loading...</div>;

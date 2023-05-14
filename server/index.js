@@ -27,17 +27,25 @@ app.use("/question", questionsRouter);
 
 app.get("/", (req, res) => {
     const { token } = req.cookies;
-    if (token) {
-        jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-            if (err) throw err;
-            const { firstName, lastName, email, _id, isAdmin } = await User.findById(
-                userData.id
-            );
-            res.json({ firstName, lastName, email, _id, isAdmin });
-        });
-    } else {
-        res.json(null);
+    try {
+        if (token) {
+            jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+                if (err) throw err;
+                const user = await User.findById(
+                    userData.id
+                );
+                // if (!user || !user.firstName || !user.lastName || !user.email || user._id || !user.isAdmin) return res.json(null);
+                const { firstName, lastName, email, _id, isAdmin } = user;
+                return res.json({ firstName, lastName, email, _id, isAdmin });
+            });
+        } else {
+            return res.json(null);
+        }
+    } catch (e) {
+        console.error(e);
+        return res.json(e.message);
     }
+
 });
 
 const port = process.env.PORT || 4000;

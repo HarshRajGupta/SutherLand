@@ -16,7 +16,7 @@ const quizSchema = new mongoose.Schema({
         ref: 'Question',
     }],
     endTime: [{
-        type: Date
+        type: Number
     }],
     score: {
         type: Number,

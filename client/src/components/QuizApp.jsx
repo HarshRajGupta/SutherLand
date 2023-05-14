@@ -65,9 +65,8 @@ Question.propTypes = {
 	answers: PropTypes.array.isRequired,
 };
 
-const QuizApp = ({ user, setUser, questions, endTime, score }) => {
-	const expiry = new Date(endTime).getTime();
-	const [timeLeft, setTimeLeft] = useState(expiry - Date.now());
+const QuizApp = ({ questions, endTime, score }) => {
+	const [timeLeft, setTimeLeft] = useState(0);
 	const [answers, setAnswers] = useState([]);
 	const [Score, setScore] = useState(score);
 	const [submitted, setSubmitted] = useState(timeLeft > 0);
@@ -84,12 +83,17 @@ const QuizApp = ({ user, setUser, questions, endTime, score }) => {
 		let totalScore = 0;
 		setScore(totalScore);
 	};
-
+	useState(() => {
+		const t = endTime[0] - Date.now();
+		setTimeLeft(t);
+		console.log('time ' + timeLeft);
+	});
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setTimeLeft((prevTime) => prevTime - 1);
 		}, 1000);
-
+		const t = Math.floor((endTime[0] - Date.now()) / 1000);
+		setTimeLeft(Math.max(0, t));
 		if (timeLeft <= 0) {
 			clearInterval(timer);
 			handleSubmit();
@@ -97,7 +101,7 @@ const QuizApp = ({ user, setUser, questions, endTime, score }) => {
 		return () => {
 			clearInterval(timer);
 		};
-	}, [timeLeft]);
+	});
 
 	const formatTime = (timeInSeconds) => {
 		const minutes = Math.floor(timeInSeconds / 60);
@@ -106,12 +110,9 @@ const QuizApp = ({ user, setUser, questions, endTime, score }) => {
 			.toString()
 			.padStart(2, '0')}`;
 	};
+
 	return (
 		<>
-			<Header
-				user={user}
-				setUser={setUser}
-			/>
 			<div className="container mx-auto px-4 py-8 relative">
 				<p className="text-lg mb-4 absolute right-0 mr-4 bg-orange-300 p-2 rounded-lg">
 					Time Remaining: {formatTime(timeLeft)}

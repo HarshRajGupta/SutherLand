@@ -2,7 +2,7 @@ import QuizApp from '../components/QuizApp';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-const QuizPage = ({ user, setUser }) => {
+const QuizPage = () => {
 	const [questions, setQuestions] = useState([]);
 	const [endTime, setEndTime] = useState(Date.now());
 	const [score, setScore] = useState(0);
@@ -38,8 +38,6 @@ const QuizPage = ({ user, setUser }) => {
 			questions={questions}
 			endTime={endTime}
 			score={score}
-			user={user}
-			setUser={setUser}
 		/>
 	);
 };

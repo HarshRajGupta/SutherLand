@@ -6,6 +6,7 @@ const AdminPanel = ({ user, setUser }) => {
 	const logoutHandler = async () => {
 		await axios.post('/auth/logout');
 		setUser(null);
+		localStorage.removeItem('user');
 	};
 	return (
 		<>
