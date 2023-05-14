@@ -1,113 +1,160 @@
-import { useEffect, useState } from "react";
-import questions from "../questions.js";
-import { Link } from "react-router-dom";
-import Header from "./Header.jsx";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import Header from './Header.jsx';
+import axios from 'axios';
+import PropTypes from 'prop-types';
 
-const QuizApp = () => {
-  const [answers, setAnswers] = useState([]);
-  const [score, setScore] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5);
+const Question = ({ questionId, handleAnswerSelection, answers }) => {
+	const [question, setQuestion] = useState();
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	};
+	const getQuestion = async () => {
+		try {
+			const res = await axios.post(
+				'http://localhost:4000/question/get',
+				{ questionId },
+				config,
+			);
+			setQuestion(res.data.Question);
+			console.log(res.data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	useEffect(() => {
+		getQuestion();
+	}, []);
+	if (!question) {
+		return <>Loading...</>;
+	} else
+		return (
+			<div className="mb-4">
+				<p className="font-semibold mb-2">{question.question}</p>
+				<ul>
+					{question.options.map((option, optionIndex) => (
+						<li key={optionIndex}>
+							<label className="inline-flex items-center">
+								<input
+									type="radio"
+									name={`question-${questionId}`}
+									value={option}
+									checked={answers[questionId] === option}
+									onChange={() => {
+										handleAnswerSelection(
+											questionId,
+											option,
+										);
+									}}
+									className="form-radio text-indigo-600"
+								/>
+								<span className="ml-2">{option}</span>
+							</label>
+						</li>
+					))}
+				</ul>
+			</div>
+		);
+};
 
-  const handleAnswerSelection = (index, selectedAnswer) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = selectedAnswer;
-    setAnswers(newAnswers);
-  };
+Question.propTypes = {
+	questionId: PropTypes.string.isRequired,
+	handleAnswerSelection: PropTypes.func.isRequired,
+	answers: PropTypes.array.isRequired,
+};
 
-  const handleSubmit = (e) => {
-    e?.preventDefault();
-    setSubmitted(true);
-    let totalScore = 0;
-    answers.forEach((answer, index) => {
-      if (answer === questions[index].correctAnswer) {
-        totalScore++;
-      }
-    });
-    setScore(totalScore);
-  };
+const QuizApp = ({ user, setUser, questions, endTime, score }) => {
+	const expiry = new Date(endTime).getTime();
+	const [timeLeft, setTimeLeft] = useState(expiry - Date.now());
+	const [answers, setAnswers] = useState([]);
+	const [Score, setScore] = useState(score);
+	const [submitted, setSubmitted] = useState(timeLeft > 0);
+	console.log(timeLeft);
+	const handleAnswerSelection = (index, selectedAnswer) => {
+		const newAnswers = [...answers];
+		newAnswers[index] = selectedAnswer;
+		setAnswers(newAnswers);
+	};
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
-    }, 1000);
+	const handleSubmit = (e) => {
+		e?.preventDefault();
+		setSubmitted(true);
+		let totalScore = 0;
+		setScore(totalScore);
+	};
 
-    if (timeLeft === 0) {
-      clearInterval(timer);
-      handleSubmit();
-    }
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setTimeLeft((prevTime) => prevTime - 1);
+		}, 1000);
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [timeLeft]);
+		if (timeLeft <= 0) {
+			clearInterval(timer);
+			handleSubmit();
+		}
+		return () => {
+			clearInterval(timer);
+		};
+	}, [timeLeft]);
 
-  // useEffect(() => {
-  //   if (timeLeft === 0) {
-  //     handleSubmit();
-  //   }
-  // }, [timeLeft]);
+	const formatTime = (timeInSeconds) => {
+		const minutes = Math.floor(timeInSeconds / 60);
+		const seconds = timeInSeconds % 60;
+		return `${minutes.toString().padStart(2, '0')}:${seconds
+			.toString()
+			.padStart(2, '0')}`;
+	};
+	return (
+		<>
+			<Header
+				user={user}
+				setUser={setUser}
+			/>
+			<div className="container mx-auto px-4 py-8 relative">
+				<p className="text-lg mb-4 absolute right-0 mr-4 bg-orange-300 p-2 rounded-lg">
+					Time Remaining: {formatTime(timeLeft)}
+				</p>
+				{questions.map((question) => (
+					<Question
+						questionId={question}
+						key={question}
+						handleAnswerSelection={handleAnswerSelection}
+						answers={answers}
+					/>
+				))}
 
-  const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds
-      .toString()
-      .padStart(2, "0")}`;
-  };
+				<div className="text-center">
+					{submitted ? (
+						<p className="mt-4 text-2xl bg-orange-200 p-3">
+							Your score: {Score}
+						</p>
+					) : (
+						<>
+							<button
+								type="submit"
+								onClick={handleSubmit}
+								className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 mx-2"
+							>
+								Submit
+							</button>
+							<Link
+								to="/"
+								className="mx-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-indigo-700"
+							>
+								HomePage
+							</Link>
+						</>
+					)}
+				</div>
+			</div>
+		</>
+	);
+};
 
-  return (
-    <>
-      <Header />
-      <div className="container mx-auto px-4 py-8 relative">
-        <p className="text-lg mb-4 absolute right-0 mr-4 bg-orange-300 p-2 rounded-lg">
-          Time Remaining: {formatTime(timeLeft)}
-        </p>
-        {questions.map((question, index) => (
-          <div key={index} className="mb-4">
-            <p className="font-semibold mb-2">{question.question}</p>
-            <ul>
-              {question.options.map((option, optionIndex) => (
-                <li key={optionIndex}>
-                  <label className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      name={`question-${index}`}
-                      value={option}
-                      checked={answers[index] === option}
-                      onChange={() => handleAnswerSelection(index, option)}
-                      className="form-radio text-indigo-600"
-                    />
-                    <span className="ml-2">{option}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-        <div className="text-center">
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 mx-2"
-          >
-            Submit
-          </button>
-          <Link
-            to="/"
-            className="mx-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-indigo-700"
-          >
-            HomePage
-          </Link>
-          {submitted && (
-            <p className="mt-4 text-2xl bg-orange-200 p-3">
-              Your score: {score}
-            </p>
-          )}
-        </div>
-      </div>
-    </>
-  );
+QuizApp.propTypes = {
+	questions: PropTypes.array.isRequired,
 };
 
 export default QuizApp;

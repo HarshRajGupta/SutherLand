@@ -1,27 +1,135 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import QuizPage from "./pages/QuizPage";
-import RegisterPage from "./pages/RegisterPage";
-import LoginPage from "./pages/LoginPage";
-import { UserContextProvider } from "./UserContext";
-import axios from "axios";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import QuizPage from './pages/QuizPage';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import Admin from './pages/Admin';
+import Question from './pages/Questions';
+import Default from './pages/Default';
+import Test from './pages/Test';
+import { UserContext } from './UserContext';
+import axios from 'axios';
+import { useContext, useEffect, useState } from 'react';
 
-axios.defaults.baseURL = "http://localhost:4000";
+axios.defaults.baseURL = 'http://localhost:4000';
 axios.defaults.withCredentials = true;
 
 const App = () => {
-  return (
-    <UserContextProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/quiz" element={<QuizPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </BrowserRouter>
-    </UserContextProvider>
-  );
+	const { user, setUser } = useContext(UserContext);
+	const [status, setStatus] = useState('loading');
+	useEffect(() => {
+		const fetchUser = async () => {
+			axios.get('/').then(({ data }) => {
+				setUser(data);
+			});
+		};
+		setStatus('loaded');
+		if (user && user._id) {
+			localStorage.setItem('user', user._id);
+		}
+		fetchUser();
+	}, []);
+	if (status === 'loading') return <div>Loading...</div>;
+	else console.log(user);
+	return (
+		<BrowserRouter>
+			<Routes>
+				<Route
+					path="/admin/*"
+					element={
+						<>
+							<Admin
+								user={user}
+								setUser={setUser}
+							/>
+						</>
+					}
+				/>
+				<Route
+					path="/register"
+					element={
+						<>
+							{user ? (
+								<Default />
+							) : (
+								<RegisterPage
+									user={user}
+									setUser={setUser}
+								/>
+							)}
+						</>
+					}
+				/>
+				<Route
+					path="/login"
+					element={
+						<>
+							{user ? (
+								<Default />
+							) : (
+								<LoginPage
+									user={user}
+									setUser={setUser}
+								/>
+							)}
+						</>
+					}
+				/>
+				<Route
+					path="/quiz/*"
+					element={
+						<>
+							<QuizPage
+								user={user}
+								setUser={setUser}
+							/>
+						</>
+					}
+				/>
+				<Route
+					path="/question"
+					element={
+						<>
+							{!user || !user.isAdmin ? (
+								<Default />
+							) : (
+								<Question
+									user={user}
+									setUser={setUser}
+								/>
+							)}
+						</>
+					}
+				/>
+				<Route
+					path="/test"
+					element={
+						<>
+							{user && user.isAdmin ? (
+								<Test
+									user={user}
+									setUser={setUser}
+								/>
+							) : (
+								<Default />
+							)}
+						</>
+					}
+				/>
+				<Route
+					path="/"
+					element={
+						<>
+							<HomePage
+								user={user}
+								setUser={setUser}
+							/>
+						</>
+					}
+				/>
+			</Routes>
+		</BrowserRouter>
+	);
 };
 
 export default App;

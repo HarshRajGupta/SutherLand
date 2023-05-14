@@ -13,7 +13,7 @@ const LoginPage = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("/login", { email, password });
+      const { data } = await axios.post("/auth/login", { email, password });
       setUser(data);
       toast.success("Login successful!");
       setRedirect(true);
