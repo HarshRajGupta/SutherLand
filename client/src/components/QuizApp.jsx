@@ -1,161 +1,189 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Header from './Header.jsx';
 import axios from 'axios';
-import PropTypes from 'prop-types';
+import Question from './Question';
 
-const Question = ({ questionId, handleAnswerSelection, answers }) => {
-	const [question, setQuestion] = useState();
-	const config = {
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	};
-	const getQuestion = async () => {
+const QuizApp = () => {
+	const [fetched, setFetched] = useState(false);
+	const [questions, setQuestions] = useState([]);
+	const [endTime, setEndTime] = useState(Date.now() + 60 * 1000 * 60);
+	const [answers, setAnswers] = useState([]);
+	const [timeLeft, setTimeLeft] = useState(60 * 1000 * 60);
+	const [score, setScore] = useState(0);
+	const [submitted, setSubmitted] = useState(true);
+	const [s, sS] = useState(0);
+	const buttonPressed = async (e) => {
+		e.preventDefault();
+		setSubmitted(true);
+		setTimeLeft(0);
+		const wait = confirm('Are you sure you want to submit');
+		if (!wait) {
+			setSubmitted(false);
+			return;
+		}
 		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			};
+			const formData = {
+				testId: window.location.pathname.split('/')[2],
+				userId: localStorage.getItem('user'),
+				answers: answers,
+			};
 			const res = await axios.post(
-				'http://localhost:4000/question/get',
-				{ questionId },
+				'http://localhost:4000/quiz/submit',
+				formData,
 				config,
 			);
-			setQuestion(res.data.Question);
-			console.log(res.data);
+			console.log(res);
+			setScore(res.data.quiz.score);
 		} catch (error) {
 			console.log(error);
 		}
 	};
-	useEffect(() => {
-		getQuestion();
-	}, []);
-	if (!question) {
-		return <>Loading...</>;
-	} else
-		return (
-			<div className="mb-4">
-				<p className="font-semibold mb-2">{question.question}</p>
-				<ul>
-					{question.options.map((option, optionIndex) => (
-						<li key={optionIndex}>
-							<label className="inline-flex items-center">
-								<input
-									type="radio"
-									name={`question-${questionId}`}
-									value={option}
-									checked={answers[questionId] === option}
-									onChange={() => {
-										handleAnswerSelection(
-											questionId,
-											option,
-										);
-									}}
-									className="form-radio text-indigo-600"
-								/>
-								<span className="ml-2">{option}</span>
-							</label>
-						</li>
-					))}
-				</ul>
-			</div>
-		);
-};
-
-Question.propTypes = {
-	questionId: PropTypes.string.isRequired,
-	handleAnswerSelection: PropTypes.func.isRequired,
-	answers: PropTypes.array.isRequired,
-};
-
-const QuizApp = ({ questions, endTime, score }) => {
-	const [timeLeft, setTimeLeft] = useState(0);
-	const [answers, setAnswers] = useState([]);
-	const [Score, setScore] = useState(score);
-	const [submitted, setSubmitted] = useState(timeLeft > 0);
-	console.log(timeLeft);
-	const handleAnswerSelection = (index, selectedAnswer) => {
-		const newAnswers = [...answers];
-		newAnswers[index] = selectedAnswer;
-		setAnswers(newAnswers);
+	const handleSubmit = async (e) => {
+		console.log('submit', fetched);
+		if (!fetched) return;
+		if (s < 3) {
+			sS(s + 1);
+			return;
+		} else {
+			setSubmitted(true);
+			setTimeLeft(0);
+			e?.preventDefault();
+			const wait = confirm('Are you sure you want to submit');
+			if (!wait) {
+				setSubmitted(false);
+				return;
+			}
+			console.log('submit');
+			if (endTime - Date.now() < 1000) return;
+			try {
+				const config = {
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				};
+				const formData = {
+					testId: window.location.pathname.split('/')[2],
+					userId: localStorage.getItem('user'),
+					answers: answers,
+				};
+				const res = await axios.post(
+					'http://localhost:4000/quiz/submit',
+					formData,
+					config,
+				);
+				console.log(res);
+				setScore(res.data.quiz.score);
+			} catch (error) {
+				console.log(error);
+			}
+		}
 	};
 
-	const handleSubmit = (e) => {
-		e?.preventDefault();
-		setSubmitted(true);
-		let totalScore = 0;
-		setScore(totalScore);
+	const getQuestions = async () => {
+		try {
+			const formData = {
+				testId: window.location.pathname.split('/')[2],
+				userId: localStorage.getItem('user'),
+			};
+			console.log(formData);
+			const res = await axios.post(
+				'http://localhost:4000/quiz/get',
+				formData,
+				{
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				},
+			);
+			console.log(res.data);
+			setQuestions(res.data.quiz.questions);
+			setEndTime(res.data.quiz.endTime);
+			setScore(res.data.quiz.score);
+			setTimeLeft(Math.max(Math.floor((endTime - Date.now()) / 1000), 0));
+			setSubmitted(res.data.quiz.endTime - Date.now() < 0);
+			if (submitted) setTimeLeft(0);
+			console.log(timeLeft + ' seconds left');
+			await setTimeout(() => {}, 1000);
+			setFetched(true);
+		} catch (error) {
+			console.log(error);
+		}
 	};
-	useState(() => {
-		const t = endTime[0] - Date.now();
-		setTimeLeft(t);
-		console.log('time ' + timeLeft);
-	});
+
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setTimeLeft((prevTime) => prevTime - 1);
 		}, 1000);
-		const t = Math.floor((endTime[0] - Date.now()) / 1000);
-		setTimeLeft(Math.max(0, t));
-		if (timeLeft <= 0) {
+		if (timeLeft === 0) {
 			clearInterval(timer);
-			handleSubmit();
+			if (!submitted && fetched) handleSubmit();
+		}
+		if (!submitted) {
+			const t = Math.floor((endTime - Date.now()) / 1000);
+			setTimeLeft(Math.max(0, t));
 		}
 		return () => {
 			clearInterval(timer);
 		};
 	});
 
-	const formatTime = (timeInSeconds) => {
-		const minutes = Math.floor(timeInSeconds / 60);
-		const seconds = timeInSeconds % 60;
-		return `${minutes.toString().padStart(2, '0')}:${seconds
-			.toString()
-			.padStart(2, '0')}`;
-	};
+	useEffect(() => {
+		getQuestions();
+	}, []);
+
+	if (!fetched) return <>Loading...</>;
 
 	return (
-		<>
-			<div className="container mx-auto px-4 py-8 relative">
+		<div>
+			<form
+				onSubmit={buttonPressed}
+				className="container mx-auto px-4 py-8 relative"
+			>
 				<p className="text-lg mb-4 absolute right-0 mr-4 bg-orange-300 p-2 rounded-lg">
 					Time Remaining: {formatTime(timeLeft)}
 				</p>
-				{questions.map((question) => (
+				{questions.map((question, index) => (
 					<Question
 						questionId={question}
-						key={question}
-						handleAnswerSelection={handleAnswerSelection}
+						key={index}
+						index={index}
 						answers={answers}
+						setAnswers={setAnswers}
 					/>
 				))}
 
 				<div className="text-center">
 					{submitted ? (
 						<p className="mt-4 text-2xl bg-orange-200 p-3">
-							Your score: {Score}
+							Your score: {score}
 						</p>
 					) : (
 						<>
 							<button
 								type="submit"
-								onClick={handleSubmit}
+								onClick={buttonPressed}
 								className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 mx-2"
 							>
 								Submit
 							</button>
-							<Link
-								to="/"
-								className="mx-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-indigo-700"
-							>
-								HomePage
-							</Link>
 						</>
 					)}
 				</div>
-			</div>
-		</>
+			</form>
+		</div>
 	);
 };
 
-QuizApp.propTypes = {
-	questions: PropTypes.array.isRequired,
+const formatTime = (timeInSeconds) => {
+	const minutes = Math.floor(timeInSeconds / 60);
+	const seconds = timeInSeconds % 60;
+	return `${minutes.toString().padStart(2, '0')}:${seconds
+		.toString()
+		.padStart(2, '0')}`;
 };
 
 export default QuizApp;

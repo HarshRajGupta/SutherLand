@@ -1,6 +1,7 @@
 const Test = require('../models/testSchema');
 const QuestionCollection = require('../models/QuestionSchema');
 const Quiz = require('../models/QuizSchema');
+const mongoose = require('mongoose');
 
 const createQuestionSet = async (number) => {
     try {
@@ -54,6 +55,12 @@ const createQuiz = async (req, res) => {
 const getQuiz = async (req, res) => {
     const { testId, userId } = req.body;
     try {
+        if (!mongoose.Types.ObjectId.isValid(testId) || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(200).json({
+                success: false,
+                msg: 'Invalid testId or userId'
+            });
+        }
         const quizObject = await Quiz.findOne({
             testId: testId,
             userId: userId
@@ -73,7 +80,7 @@ const getQuiz = async (req, res) => {
     }
     catch (err) {
         console.error(err.message);
-        return res.status(500).json({
+        return res.status(200).json({
             success: false,
             msg: err.message
         });
@@ -81,15 +88,23 @@ const getQuiz = async (req, res) => {
 }
 
 const calculateScore = async (questions, answers) => {
+    console.log('DEBUG: Calculating score');
+    console.log(questions);
+    console.log(answers);
     try {
+
         let score = 0;
         for (let i = 0; i < questions.length; i++) {
             const question = await QuestionCollection.findById(questions[i]);
             const answer = answers[i];
-            if (question.correctAnswer === answer) {
+            console.log(question);
+            console.log(answer);
+            if (question.correctOption === answer) {
                 ++score;
             }
         }
+        console.log('DEBUG: Score calculated');
+        console.log(score);
         return score;
     } catch (err) {
         console.error(err.message);
@@ -99,15 +114,27 @@ const calculateScore = async (questions, answers) => {
 
 const submitQuiz = async (req, res) => {
     const { testId, userId, answers } = req.body;
+    console.log('DEBUG: Submit Quiz request received');
+    console.log(req.body);
     try {
+        if (!mongoose.Types.ObjectId.isValid(testId) || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(200).json({
+                success: false,
+                msg: 'Invalid testId or userId'
+            });
+        }
         const quizObject = await Quiz.findOne({
             testId: testId,
             userId: userId
         });
-        if (quizObject) {
+        console.log('DEBUG: Quiz found');
+        console.log(quizObject);
+        if (quizObject && !quizObject.attempted) {
             if (quizObject.endTime + (300000) >= Date.now()) {
-                const score = await calculateScore(quizObject.questionSet, answers);
+                const score = await calculateScore(quizObject.questions, answers);
                 quizObject.score = score;
+                quizObject.endTime = Date.now();
+                // quizObject.attempted = true;
                 const quiz = await quizObject.save();
                 console.log('DEBUG: Quiz submitted');
                 return res.status(200).json({
@@ -116,20 +143,21 @@ const submitQuiz = async (req, res) => {
                     msg: 'Quiz submitted'
                 });
             } else {
-                return res.status(400).json({
+                return res.status(500).json({
                     success: false,
                     msg: 'Quiz over'
                 });
             }
         }
         else {
-            return res.status(404).json({
+            return res.status(200).json({
                 success: false,
-                msg: 'Quiz not found'
+                msg: 'Quiz not found',
+                quiz: quizObject
             });
         }
     } catch (err) {
-        console.error(err.message);
+        console.error('Error: ' + err.message);
         return res.status(500).json({
             success: false,
             msg: err.message

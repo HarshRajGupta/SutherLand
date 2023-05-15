@@ -7,6 +7,7 @@ import Admin from './pages/Admin';
 import Question from './pages/Questions';
 import Default from './pages/Default';
 import Test from './pages/Test';
+import QuizIndex from './pages/QuizIndex';
 import { UserContext } from './UserContext';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
@@ -28,7 +29,6 @@ const App = () => {
 		fetchUser();
 	}, []);
 	if (status === 'loading') return <div>Loading...</div>;
-	else console.log(user);
 	return (
 		<BrowserRouter>
 			<Routes>
@@ -70,6 +70,17 @@ const App = () => {
 									setUser={setUser}
 								/>
 							)}
+						</>
+					}
+				/>
+				<Route
+					path="/quiz"
+					element={
+						<>
+							<QuizIndex
+								user={user}
+								setUser={setUser}
+							/>
 						</>
 					}
 				/>
