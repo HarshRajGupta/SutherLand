@@ -14,7 +14,6 @@ import { UserContext } from './UserContext';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 
-// axios.defaults.baseURL = 'https://sutherland-backend.onrender.com';
 axios.defaults.baseURL = 'http://localhost:4000';
 axios.defaults.withCredentials = true;
 
@@ -140,10 +139,6 @@ const App = () => {
 							) : (
 								<Default />
 							)}
-							{/* <TestDetails
-								user={user}
-								setUser={setUser}
-							/> */}
 						</>
 					}
 				/>
