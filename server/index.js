@@ -27,9 +27,9 @@ app.use("/question", questionsRouter);
 
 app.get("/", (req, res) => {
     const { token } = req.cookies;
-    console.log('DEBUG: /')
+    console.log('DEBUG: /get')
     try {
-        console.log(token)
+        console.log(req.cookies)
         if (token) {
             jwt.verify(token, jwtSecret, {}, async (err, userData) => {
                 if (err) throw err;
