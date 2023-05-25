@@ -48,6 +48,7 @@ const loginUser = async (req, res) => {
                 {},
                 (err, token) => {
                     if (err) throw err;
+                    console.log({ token });
                     res.cookie("token", token).json(userDoc);
                 }
             );
