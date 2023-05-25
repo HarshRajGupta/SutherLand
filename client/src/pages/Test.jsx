@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const CreateTest = ({ getTests }) => {
 	const [duration, setDuration] = useState(0);
@@ -68,23 +69,33 @@ const CreateTest = ({ getTests }) => {
 	);
 };
 
-const Test = ({ testId }) => {
-	const BaseURL = 'http://localhost:5173/quiz/';
+const Test = ({ testId, time, num }) => {
+	const BaseURL = 'http://localhost:5173';
 	return (
-		<div className="flex items-center bg-slate-100 justify-around m-4">
-			<a
-				href={BaseURL + testId}
-				className="text-2xl font-bold m-4 flex flex-col items-center justify-center"
-			>
-				{testId}
-			</a>
-			<button
-				className="bg-indigo-600 text-white rounded hover:bg-indigo-700 px-4 py-2"
-				onClick={() => navigator.clipboard.writeText(BaseURL + testId)}
-			>
-				{' '}
-				copy link
-			</button>
+		<div className="bg-slate-100 m-4 p-4">
+			<div className="flex items-center justify-around">
+				<Link
+					to={testId}
+					className="text-2xl font-bold m-4 flex flex-col items-center justify-center"
+				>
+					{testId}
+				</Link>
+				<button
+					className="bg-indigo-600 text-white rounded hover:bg-indigo-700 px-4 py-2"
+					onClick={() =>
+						navigator.clipboard.writeText(
+							BaseURL + '/quiz/' + testId,
+						)
+					}
+				>
+					{' '}
+					Copy Test Link
+				</button>
+			</div>
+			<div className="flex items-center justify-around text-1xl">
+				<div>Test Duration: {time} minutes</div>
+				<div className="px-4 py-2 ml-36">{num} Questions</div>
+			</div>
 		</div>
 	);
 };
@@ -107,11 +118,13 @@ const Tests = () => {
 		<div className="container mx-auto px-4 py-8 relative">
 			<CreateTest getTests={getTests} />
 			<>
-				{testList.map(({ _id }) => {
+				{testList.map((test) => {
 					return (
 						<Test
-							testId={_id}
-							key={_id}
+							testId={test._id}
+							key={test._id}
+							time={test.testDuration}
+							num={test.numQuestions}
 						/>
 					);
 				})}

@@ -8,6 +8,8 @@ import Question from './pages/Questions';
 import Default from './pages/Default';
 import Test from './pages/Test';
 import QuizIndex from './pages/QuizIndex';
+import TestDetails from './pages/TestDetails';
+import UserDetails from './pages/User';
 import { UserContext } from './UserContext';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
@@ -123,6 +125,34 @@ const App = () => {
 								<Default />
 							)}
 						</>
+					}
+				/>
+				<Route
+					path="/test/*"
+					element={
+						<>
+							{user && user.isAdmin ? (
+								<TestDetails
+									user={user}
+									setUser={setUser}
+								/>
+							) : (
+								<Default />
+							)}
+							{/* <TestDetails
+								user={user}
+								setUser={setUser}
+							/> */}
+						</>
+					}
+				/>
+				<Route
+					path="/user/*"
+					element={
+						<UserDetails
+							user={user}
+							setUser={setUser}
+						/>
 					}
 				/>
 				<Route
