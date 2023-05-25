@@ -30,6 +30,7 @@ app.get("/", (req, res) => {
     console.log('DEBUG: /get')
     try {
         console.log(req.cookies)
+        console.log('Signed Cookies: ', req.signedCookies)
         if (token) {
             jwt.verify(token, jwtSecret, {}, async (err, userData) => {
                 if (err) throw err;
