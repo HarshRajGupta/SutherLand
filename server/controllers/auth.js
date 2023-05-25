@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = "fasefraw4r5r3wq45wdfgw34twdfg";
 
@@ -24,6 +23,7 @@ const registerUser = async (req, res) => {
             {},
             (err, token) => {
                 if (err) throw err;
+                console.log({ token });
                 res.cookie("token", token).json(userDoc);
             }
         );
