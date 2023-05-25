@@ -27,9 +27,9 @@ const registerUser = async (req, res) => {
                 res.cookie("token", token).json(userDoc);
             }
         );
-        return res.json(userDoc);
+        res.json(userDoc);
     } catch (e) {
-        return res.status(422).json(e);
+        res.status(422).json(e);
     }
 };
 
@@ -49,13 +49,10 @@ const loginUser = async (req, res) => {
                 (err, token) => {
                     if (err) throw err;
                     res.cookie("token", token).json(userDoc);
-                    console.log("login successful");
-                    console.log(res.cookie);
                 }
             );
-            res.json("login successful");
         } else {
-            return res.status(422).json("pass not ok");
+            res.status(422).json("pass not ok");
         }
     } else {
         res.json("not found");

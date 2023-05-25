@@ -16,7 +16,7 @@ const QuizPage = () => {
 						<label>
 							QUIZ ID :
 							<input
-								className="w-full px-4 py-2 bg-gray-100 text-white rounded  mx-2 my-2"
+								className="w-full px-4 py-2 bg-gray-100 rounded  mx-2 my-2"
 								type="text"
 								value={testId}
 								onChange={(event) =>
