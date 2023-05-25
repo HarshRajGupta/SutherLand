@@ -14,10 +14,16 @@ const questionsRouter = require("./routes/questions");
 const jwtSecret = "fasefraw4r5r3wq45wdfgw34twdfg";
 app.use(express.json());
 app.use(cookieParser());
+// app.use(
+//     cors({
+//         credentials: true,
+//         origin: "https://sutherland.onrender.com",
+//     })
+// );
 app.use(
     cors({
         credentials: true,
-        origin: "https://sutherland.onrender.com",
+        origin: "http://localhost:5173",
     })
 );
 app.use("/auth", authRouter);
