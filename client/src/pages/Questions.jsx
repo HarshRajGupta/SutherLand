@@ -54,7 +54,7 @@ const AddQuestionButton = ({ getQuestions }) => {
 				correctOption: correctOption - 1,
 			};
 			const res = await axios.post(
-				'http://localhost:4000/admin/question/new',
+				'admin/question/new',
 				formData,
 				config,
 			);

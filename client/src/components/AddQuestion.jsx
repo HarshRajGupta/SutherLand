@@ -30,7 +30,7 @@ const AddQuestion = () => {
             setOption3('');
             setOption4('');
             setCorrectOption();
-            const res = await axios.post('http://localhost:4000/admin/question/new', formData, config);
+            const res = await axios.post('admin/question/new', formData, config);
             setStatus("sent");
             console.log(res);
         } catch (error) {

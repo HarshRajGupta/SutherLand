@@ -12,7 +12,7 @@ const Question = ({ questionId, index, answers, setAnswers }) => {
 		if (!questionId) return;
 		try {
 			const res = await axios.post(
-				'http://localhost:4000/question/get',
+				'question/get',
 				{ questionId },
 				config,
 			);

@@ -32,7 +32,7 @@ const QuizApp = () => {
 				answers: answers,
 			};
 			const res = await axios.post(
-				'http://localhost:4000/quiz/submit',
+				'quiz/submit',
 				formData,
 				config,
 			);
@@ -71,7 +71,7 @@ const QuizApp = () => {
 					answers: answers,
 				};
 				const res = await axios.post(
-					'http://localhost:4000/quiz/submit',
+					'quiz/submit',
 					formData,
 					config,
 				);
@@ -91,7 +91,7 @@ const QuizApp = () => {
 			};
 			console.log(formData);
 			const res = await axios.post(
-				'http://localhost:4000/quiz/get',
+				'quiz/get',
 				formData,
 				{
 					headers: {

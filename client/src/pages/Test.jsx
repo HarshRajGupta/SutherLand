@@ -19,7 +19,7 @@ const CreateTest = ({ getTests }) => {
 				numQuestions,
 			};
 			const res = await axios.post(
-				'http://localhost:4000/admin/test/new',
+				'admin/test/new',
 				formData,
 				config,
 			);
