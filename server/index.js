@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(
     cors({
         credentials: true,
-        origin: "https://sutherland.onrender.com/",
+        origin: "https://sutherland.onrender.com",
     })
 );
 app.use("/auth", authRouter);
