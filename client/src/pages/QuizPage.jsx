@@ -1,7 +1,7 @@
-import QuizApp from '../components/QuizApp';
+import QuizApp from "../components/QuizApp";
 
 const QuizPage = () => {
-	return <QuizApp />;
+  return <QuizApp />;
 };
 
 export default QuizPage;
