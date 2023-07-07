@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import User from '../components/User';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import User from "../components/User";
 
 // const User = ({ userId, score }) => {
 // 	const BaseURL = 'http://localhost:5173/user/';
@@ -21,43 +21,37 @@ import User from '../components/User';
 // };
 
 const Tests = () => {
-	const [quizList, setQuiz] = useState([]);
-	useEffect(() => {
-		const testId = window.location.pathname.split('/')[2];
-		const getTests = async () => {
-			try {
-				const res = await axios.post(
-					'admin/quiz',
-					{ testId: testId },
-					{
-						headers: {
-							'Content-Type': 'application/json',
-						},
-					},
-				);
-				console.log(res);
-				setQuiz(res.data.quiz);
-			} catch (error) {
-				console.log(error);
-			}
-		};
-		getTests();
-	}, []);
-	return (
-		<div className="container mx-auto px-4 py-8 relative">
-			<>
-				{quizList.map(({ userId, score }) => {
-					return (
-						<User
-							key={userId}
-							userId={userId}
-							score={score}
-						/>
-					);
-				})}
-			</>
-		</div>
-	);
+  const [quizList, setQuiz] = useState([]);
+  useEffect(() => {
+    const testId = window.location.pathname.split("/")[2];
+    const getTests = async () => {
+      try {
+        const res = await axios.post(
+          "admin/quiz",
+          { testId: testId },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(res);
+        setQuiz(res.data.quiz);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getTests();
+  }, []);
+  return (
+    <div className="container mx-auto px-4 py-8 relative">
+      <>
+        {quizList.map(({ userId, score }) => {
+          return <User key={userId} userId={userId} score={score} />;
+        })}
+      </>
+    </div>
+  );
 };
 
 export default Tests;

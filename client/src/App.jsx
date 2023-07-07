@@ -27,6 +27,7 @@ const App = () => {
       });
     };
     setStatus("loaded");
+    console.log(user);
     fetchUser();
   }, []);
   if (status === "loading") return <div>Loading...</div>;
