@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import axios from "axios";
@@ -12,7 +13,7 @@ const AdminPanel = ({ user, setUser }) => {
     <>
       <Header user={user} setUser={setUser} />
       <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold mb-8">Assessment Test</h1>
+        <h1 className="text-4xl font-bold mb-8">Welcome to Admin Page</h1>
         <div className="space-y-4">
           {!user || !user.isAdmin ? (
             <div onClick={logoutHandler}>

@@ -1,5 +1,7 @@
+/* eslint-disable react/prop-types */
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+// import PropTypes from "prop-types";
 
 const HomePage = ({ user, setUser }) => {
   return (
@@ -10,6 +12,11 @@ const HomePage = ({ user, setUser }) => {
         <div className="space-y-4">
           {!user ? (
             <>
+              <Link to="/admin">
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-2">
+                  Admin Page
+                </button>
+              </Link>
               <Link to="/register">
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-2">
                   Register
@@ -33,5 +40,7 @@ const HomePage = ({ user, setUser }) => {
     </>
   );
 };
+
+// HomePage.propTypes = { user: PropTypes.object, setUser: PropTypes.func };
 
 export default HomePage;

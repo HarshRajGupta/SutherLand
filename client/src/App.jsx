@@ -25,9 +25,9 @@ const App = () => {
       axios.get("/").then(({ data }) => {
         setUser(data);
       });
+      setStatus("loaded");
+      console.log(user);
     };
-    setStatus("loaded");
-    console.log(user);
     fetchUser();
   }, []);
   if (status === "loading") return <div>Loading...</div>;
