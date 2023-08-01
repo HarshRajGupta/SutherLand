@@ -22,8 +22,7 @@ const LoginPage = () => {
       toast.success("Login successful!");
       setRedirect(true);
     } catch (e) {
-      alert("Login failed");
-      console.log(e);
+      toast.error(e?.response?.data)
     }
   };
 

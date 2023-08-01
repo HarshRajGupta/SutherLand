@@ -29,7 +29,12 @@ const registerUser = async (req, res) => {
         );
         res.json(userDoc);
     } catch (e) {
-        res.status(422).json(e);
+        const user = await User.findOne({ email: email });
+        if (user) {
+            res.status(422).json("user already exists");
+        } else {
+            res.status(422).json("Registration failed!")
+        }
     }
 };
 
@@ -48,7 +53,6 @@ const loginUser = async (req, res) => {
                 {},
                 (err, token) => {
                     if (err) throw err;
-                    console.log({ token });
                     res.cookie("token", token)
                     res.json(userDoc);
                 }
@@ -57,7 +61,7 @@ const loginUser = async (req, res) => {
             res.status(422).json("pass not ok");
         }
     } else {
-        res.json("not found");
+        res.status(422).json("not found");
     }
 };
 

@@ -21,7 +21,7 @@ const RegisterPage = () => {
       setRedirect("/login");
       toast.success("Registered Successfully!");
     } catch (error) {
-      toast.error("Registration failed!");
+      toast.error(error?.response?.data);
     }
   };
   if (redirect) {

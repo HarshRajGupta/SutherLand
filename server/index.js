@@ -2,36 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./db/connect");
 const cookieParser = require("cookie-parser");
-const authRouter = require("./routes/auth");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const app = express();
 const User = require("./models/User");
-const adminRouter = require("./routes/admin");
-const quizRouter = require("./routes/quiz");
-const questionsRouter = require("./routes/questions");
+
+const apiRouter = require("./routes");
 
 const jwtSecret = "fasefraw4r5r3wq45wdfgw34twdfg";
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(
-  cors({
-    credentials: true,
-    origin: "http://localhost:5173",
-  })
-);
-app.use("/auth", authRouter);
-app.use("/admin", adminRouter);
-app.use("/quiz", quizRouter);
-app.use("/question", questionsRouter);
+app.use(express.static("view"));
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   const { token } = req.cookies;
-  console.log("DEBUG: /get");
+  // console.log(token)
+  // console.log("DEBUG: /get");
   try {
-    console.log(req.cookies);
-    console.log("Signed Cookies: ", req.signedCookies);
+    // console.log(req);
+    // console.log("Signed Cookies: ", req.signedCookies);
     if (token) {
       jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
@@ -56,6 +46,8 @@ app.get("/", (req, res) => {
     return res.json(e.message);
   }
 });
+
+app.use("/api", apiRouter);
 
 const port = process.env.PORT || 4000;
 
