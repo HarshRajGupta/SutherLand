@@ -8,7 +8,6 @@ const User = require("./models/User");
 
 const apiRouter = require("./routes");
 
-const jwtSecret = "fasefraw4r5r3wq45wdfgw34twdfg";
 app.use(express.json());
 app.use(cookieParser());
 
@@ -22,7 +21,7 @@ app.get("/api", (req, res) => {
     // console.log(req);
     // console.log("Signed Cookies: ", req.signedCookies);
     if (token) {
-      jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
         if (err) throw err;
         const user = await User.findById(userData.id);
         console.log(user);
