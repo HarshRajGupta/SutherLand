@@ -3,7 +3,7 @@ import axios from "axios";
 import User from "../components/User";
 
 // const User = ({ userId, score }) => {
-// 	const BaseURL = 'http://localhost:5173/user/';
+// 	const BaseURL = 'https://sutherland.onrender.com/user/';
 // 	return (
 // 		<div className="flex items-center bg-slate-100 justify-around m-4">
 // 			<a

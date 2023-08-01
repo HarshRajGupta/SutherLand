@@ -63,7 +63,7 @@ const CreateTest = ({ getTests }) => {
 };
 
 const Test = ({ testId, time, num }) => {
-  const BaseURL = "http://localhost:5173";
+  const BaseURL = "https://sutherland.onrender.com";
   return (
     <div className="bg-slate-100 m-4 p-4">
       <div className="flex items-center justify-around">
