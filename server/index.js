@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const connectDB = require("./db/connect");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
