@@ -1,24 +1,26 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const testSchema = new mongoose.Schema({
   testDuration: {
     type: Number,
-    required: true
+    required: true,
   },
   numQuestions: {
     type: Number,
-    required: true
+    required: true,
   },
-  candidates: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Candidate'
-  }],
+  candidates: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Candidate",
+    },
+  ],
   // expiryTime: {
-  //   type: Date, 
+  //   type: Date,
   //   required: true
   // }
 });
 
-const Test = mongoose.model('Test', testSchema);
+const Test = mongoose.model("Test", testSchema);
 
 module.exports = Test;
